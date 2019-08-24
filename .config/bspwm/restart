@@ -1,0 +1,15 @@
+killall -9 xwinwrap
+killall -9 polybar
+killall -9 sxhkd
+killall -9 compton
+
+bspc config top_padding 20
+bspc config bottom_padding 20
+
+compton &
+animwall &
+for m in $(xrandr --query | grep " connected" | cut -d" " -f1); do
+    MONITOR=$m polybar top &
+    MONITOR=$m polybar bottom &
+done
+sxhkd -m 1 &

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+
+while [[ 1 ]]; do
+  xrandrOut=$(xrandr)
+
+  hdmiName=$(echo "${xrandrOut}" | grep -i 'HDMI' | awk '{print $1}')
+  vgaName=$(echo "${xrandrOut}" | grep -i 'VGA' | awk '{print $1}')
+  edpName=$(echo "${xrandrOut}" | grep -i 'EDP' | awk '{print $1}')
+
+  activeDisplays=$(echo "${xrandrOut}" | grep " connected" | sed -e "s/\([A-Z0-9]\+\) connected.*/\1/" | tr '\n' ' ')
+  displayFile='/home/threadr/.config/bspwm/.displays'
+  desktopFile='/home/threadr/.config/bspwm/.desktop'
+  primaryDisplay=""
+
+  if [[ -f "${displayFile}" ]]; then
+      oldDisplays=$(cat "${displayFile}")
+  else
+      oldDisplays=""
+  fi
+  echo $oldDisplays
+  echo "---"
+  echo $activeDisplays
+  
+  if [[ "${oldDisplays}" != "${activeDisplays}" ]]; then
+      change="yes"
+  else
+      change="no"
+  fi
+
+  if [[ "$activeDisplays" =~ "${hdmiName}" ]]; then
+    primaryDisplay="${hdmiName}"
+  # External, VGA
+  elif [[ "$activeDisplays" =~ "${vgaName}" ]]; then
+    primaryDisplay="${vgaName}"
+  # Only one internal
+  elif [[ "$activeDisplays" =~ "${edpName}" ]]; then
+    primaryDisplay="${edpName}"
+  fi
+
+  if [[ "${change}" == "yes" ]]; then
+    notify-send -u normal "Change display to \"${primaryDisplay}\"."
+    if [[ "$primaryDisplay" = "${hdmiName}" ]]; then
+        xrandr --output eDP1 --mode 1600x900 --pos 1920x369 --rotate normal --output HDMI1 --primary --mode 1920x1080 --pos 0x0 --rotate normal --output VGA1 --off --output VIRTUAL1 --off
+    else
+        xrandr --output eDP1 --primary --mode 1600x900 --pos 0x0 --rotate normal --output HDMI1 --off --output VGA1 --off --output VIRTUAL1 --off
+    fi
+
+    ~/.config/bspwm/restart
+    echo "$activeDisplays" > $displayFile
+  fi
+
+  if  [[ "${1}" == 'once' ]]; then
+    break
+  else
+    if [[ "${change}" == "yes" ]]; then
+      sleep 5
+    else
+      sleep 2
+    fi
+  fi
+done
+
+echo "${primaryDisplay}"
+echo "" > $displayFile
