@@ -3,13 +3,22 @@ killall -9 polybar
 killall -9 sxhkd
 killall -9 compton
 
-bspc config top_padding 20
-bspc config bottom_padding 20
+bspc config top_padding 29
+bspc config bottom_padding 0
+#bspc config bottom_padding 20
 
 compton &
-animwall &
+#animwall &
+#feh --bg-fill /home/threadr/Images/wu-yi-152057.jpg
+#feh --bg-fill /home/threadr/Images/4k-wallpaper-background-beautiful-853199.jpg
+
+wal -R -a 80 #90
+
+source ~/.cache/wal/colors.sh
+export color0_alpha="#22${color0/'#'}"
+
 for m in $(xrandr --query | grep " connected" | cut -d" " -f1); do
     MONITOR=$m polybar top &
-    MONITOR=$m polybar bottom &
+#    MONITOR=$m polybar bottom &
 done
 sxhkd -m 1 &
