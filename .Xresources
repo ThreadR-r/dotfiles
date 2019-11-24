@@ -58,12 +58,16 @@ URxvt*iso14755:			false
 URxvt*urgentOnBell:		true
 
 ! appearance
-URxvt*depth:			24
+! URxvt*depth:			24
 URxvt*scrollBar:		false
 URxvt*scrollBar_right:	false
 URxvt*internalBorder:	24
 URxvt*externalBorder:	0
 URxvt.geometry:			84x22
+
+URxvt.depth                             : 32
+URxvt.fading                            : 10
+URxvt*background                        : [85]#1c1c1c
 
 ! macros for clipboard and selection
 URxvt.copyCommand:		xclip -i -selection clipboard
